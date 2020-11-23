@@ -192,7 +192,7 @@ Item {
 
         GridLayout{
             columns: 2
-            rows: 4
+            rows: 5
             flow: GridLayout.TopToBottom
 
             Label{
@@ -236,6 +236,17 @@ Item {
                 onCheckedChanged: {
                     if (checked) {
                         root.visibility = AppletDecoration.Types.ActiveMaximizedWindow;
+                    }
+                }
+            }
+            RadioButton{
+                id: anyMaximizedBtn
+                text: i18n("Any window is maximized")
+                checked: root.visibility === AppletDecoration.Types.AnyMaximizedWindow
+                exclusiveGroup: visibilityGroup
+                onCheckedChanged: {
+                    if (checked) {
+                        root.visibility = AppletDecoration.Types.AnyMaximizedWindow;
                     }
                 }
             }
