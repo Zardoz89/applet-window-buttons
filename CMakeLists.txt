@@ -1,5 +1,5 @@
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(applet_windowbuttons)
-cmake_minimum_required(VERSION 3.0 FATAL_ERROR)
 
 set(CMAKE_CXX_STANDARD 14)
 set(VERSION 0.11.1)
