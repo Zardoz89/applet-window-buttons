@@ -263,10 +263,12 @@ WId PreviewClient::windowId() const
     return 0;
 }
 
+#if KDECORATION2_VERSION_MINOR >= 27
 QString PreviewClient::windowClass() const
 {
     return QString("kwin_preview");
 }
+#endif
 
 QPalette PreviewClient::palette() const
 {

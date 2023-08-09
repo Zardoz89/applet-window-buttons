@@ -50,6 +50,34 @@ Item {
     readonly property bool inEditMode: latteInEditMode || plasmoid.userConfiguring
 
     readonly property bool plasma515: AppletDecoration.Environment.plasmaDesktopVersion >= AppletDecoration.Environment.makeVersion(5,15,0)
+    readonly property bool isStackingOrderSupported: {
+        var supported = false;
+
+        if (latteBridge) {
+            if (latteBridge.version < latteBridge.actions.version(0,9,75)) { // TODO: replace with version that actually has the patches
+                supported = false;
+            } else if (AppletDecoration.Environment.isPlatformX11) {
+                supported = true;
+            } else if (AppletDecoration.Environment.isPlatformWayland &&
+                    AppletDecoration.Environment.frameworksVersion >= AppletDecoration.Environment.makeVersion(5,73,0)) {
+                supported = true;
+            }
+        } else {
+            if (AppletDecoration.Environment.isPlatformX11 &&
+                    AppletDecoration.Environment.plasmaDesktopVersion >= AppletDecoration.Environment.makeVersion(5,18,0)) {
+                supported = true;
+            } else if (AppletDecoration.Environment.isPlatformWayland &&
+                    AppletDecoration.Environment.plasmaDesktopVersion >= AppletDecoration.Environment.makeVersion(5,21,2)) { // TODO: replace with version that actually has the patches
+                supported = true;
+            }
+        }
+
+        plasmoid.configuration.isStackingOrderSupported = supported;
+
+        return supported;
+    }
+    
+    readonly property bool useAnyMaximizedWindow: visibility === AppletDecoration.Types.AnyMaximizedWindow
 
     readonly property bool mustHide: {
         if (visibility === AppletDecoration.Types.AlwaysVisible || inEditMode) {
@@ -64,7 +92,12 @@ Item {
                 && (!isLastActiveWindowMaximized || (inPlasmaPanel && !existsWindowActive))) {
             return true;
         }
+
         if (visibility === AppletDecoration.Types.ShownWindowExists && !existsWindowShown) {
+            return true;
+        }
+
+        if (visibility === AppletDecoration.Types.AnyMaximizedWindow && !existsWindowMaximized) {
             return true;
         }
 
@@ -78,7 +111,10 @@ Item {
     readonly property bool isEmptySpaceEnabled: plasmoid.configuration.hiddenState === AppletDecoration.Types.EmptySpace
 
     readonly property int containmentType: plasmoid.configuration.containmentType
-    readonly property int visibility: plasmoid.configuration.visibility
+    readonly property int visibility: (plasmoid.configuration.visibility === AppletDecoration.Types.AnyMaximizedWindow) &&
+                                      !isStackingOrderSupported ?
+                                          AppletDecoration.Types.ActiveMaximizedWindow :
+                                          plasmoid.configuration.visibility
 
     readonly property int minimumWidth: {
         if (plasmoid.formFactor === PlasmaCore.Types.Horizontal) {
@@ -164,6 +200,9 @@ Item {
     readonly property bool existsWindowShown: (windowInfoLoader.item && windowInfoLoader.item.existsWindowShown)
                                               || containmentIdentifierTimer.running
 
+    readonly property bool existsWindowMaximized: (windowInfoLoader.item && windowInfoLoader.item.existsWindowMaximized)
+                                              || containmentIdentifierTimer.running
+
     readonly property bool isLastActiveWindowPinned: lastActiveTaskItem && existsWindowShown && lastActiveTaskItem.isOnAllDesktops
     readonly property bool isLastActiveWindowMaximized: lastActiveTaskItem && existsWindowShown && lastActiveTaskItem.isMaximized
     readonly property bool isLastActiveWindowKeepAbove: lastActiveTaskItem && existsWindowShown && lastActiveTaskItem.isKeepAbove
@@ -180,7 +219,7 @@ Item {
     readonly property bool inPlasmaPanel: latteBridge === null
     readonly property bool inLatte: latteBridge !== null
 
-    readonly property Item lastActiveTaskItem: windowInfoLoader.item.lastActiveTaskItem
+    readonly property Item lastActiveTaskItem: windowInfoLoader.item.operatingTaskItem
     // END Window properties
 
     // START decoration properties

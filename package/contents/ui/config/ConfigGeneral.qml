@@ -62,7 +62,11 @@ Item {
     property string currentPlugin: root.useCurrent || !selectedDecorationExists ? decorations.currentPlugin : root.selectedPlugin
     property string currentTheme: root.useCurrent || !selectedDecorationExists ? decorations.currentTheme : root.selectedTheme
 
-
+    Component.onCompleted: {
+        if (!plasmoid.configuration.isStackingOrderSupported && cfg_visibility === AppletDecoration.Types.AnyMaximizedWindow) {
+            cfg_visibility = AppletDecoration.Types.ActiveMaximizedWindow;
+        }
+    }
 
     ///START Decoration Items
     AppletDecoration.Bridge {
@@ -192,12 +196,12 @@ Item {
 
         GridLayout{
             columns: 2
-            rows: 4
+            rows: 5
             flow: GridLayout.TopToBottom
 
             Label{
                 Layout.minimumWidth: Math.max(centerFactor * root.width, minimumWidth)
-                Layout.rowSpan: 4
+                Layout.rowSpan: 5
                 Layout.alignment: Qt.AlignTop | Qt.AlignRight
                 text: i18n("Show:")
                 horizontalAlignment: Text.AlignRight
@@ -236,6 +240,18 @@ Item {
                 onCheckedChanged: {
                     if (checked) {
                         root.visibility = AppletDecoration.Types.ActiveMaximizedWindow;
+                    }
+                }
+            }
+            RadioButton{
+                id: anyMaximizedBtn
+                text: i18n("Any window is maximized")
+                visible: plasmoid.configuration.isStackingOrderSupported
+                checked: root.visibility === AppletDecoration.Types.AnyMaximizedWindow
+                exclusiveGroup: visibilityGroup
+                onCheckedChanged: {
+                    if (checked) {
+                        root.visibility = AppletDecoration.Types.AnyMaximizedWindow;
                     }
                 }
             }
