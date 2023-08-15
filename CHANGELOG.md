@@ -1,5 +1,11 @@
 ### CHANGELOG
 
+#### Version 0.11.1
+
+* Support Plasma 5.24 to 5.27
+
+#### Version 0.11.1
+
 #### Version 0.11.0
 
 * support Plasma 5.24 way of discovering themes from theme engines
