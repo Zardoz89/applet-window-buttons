@@ -19,6 +19,12 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED NO_MODULE COMPONENTS Gui Qml 
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS CoreAddons Declarative Plasma PlasmaQuick)
 find_package(KDecoration2 ${KDECORATION2_MIN_VERSION} REQUIRED)
 
+foreach(c Core Quick Qml)
+    if(${Qt5${c}_FOUND})
+        message(STATUS "Qt5${c} found!")
+    endif()
+endforeach()
+
 include(ECMQMLModules)
 include(CheckIncludeFiles)
 include(KDECMakeSettings)
